@@ -9,7 +9,11 @@ import {
   SubscriptionScope,
   TenantScope,
 } from "./config";
-import { createDeploymentClient, createStacksClient } from "./azure";
+import {
+  createDeploymentClient,
+  createStacksClient,
+  getDefaultSubscriptionId,
+} from "./azure";
 import { errorMessages } from "./errorMessages";
 import { loggingMessages } from "./loggingMessages";
 
@@ -32,7 +36,7 @@ export function getScopedId(config: DeployConfig): string {
     case "resourceGroup":
       return scope.resourceGroup;
     case "subscription":
-      return scope.subscriptionId;
+      return scope.subscriptionId ?? "";
     case "managementGroup":
       return scope.managementGroup;
     case "tenant":
@@ -42,7 +46,7 @@ export function getScopedId(config: DeployConfig): string {
   }
 }
 
-export function getDeploymentClient(
+export async function getDeploymentClient(
   config: DeployConfig,
   scope:
     | TenantScope
@@ -52,13 +56,23 @@ export function getDeploymentClient(
   logger: Logger,
 ) {
   const { tenantId } = scope;
-  const subscriptionId =
+  let subscriptionId =
     "subscriptionId" in scope ? scope.subscriptionId : undefined;
+
+  // If subscriptionId not provided, try to get it from Azure context
+  if (!subscriptionId && "subscriptionId" in scope) {
+    subscriptionId = await getDefaultSubscriptionId();
+    if (subscriptionId) {
+      logger.logInfo(
+        loggingMessages.usingSubscriptionFromContext(subscriptionId),
+      );
+    }
+  }
 
   return createDeploymentClient(config, logger, subscriptionId, tenantId);
 }
 
-export function getStacksClient(
+export async function getStacksClient(
   config: DeployConfig,
   scope:
     | TenantScope
@@ -68,8 +82,18 @@ export function getStacksClient(
   logger: Logger,
 ) {
   const { tenantId } = scope;
-  const subscriptionId =
+  let subscriptionId =
     "subscriptionId" in scope ? scope.subscriptionId : undefined;
+
+  // If subscriptionId not provided, try to get it from Azure context
+  if (!subscriptionId && "subscriptionId" in scope) {
+    subscriptionId = await getDefaultSubscriptionId();
+    if (subscriptionId) {
+      logger.logInfo(
+        loggingMessages.usingSubscriptionFromContext(subscriptionId),
+      );
+    }
+  }
 
   return createStacksClient(config, logger, subscriptionId, tenantId);
 }

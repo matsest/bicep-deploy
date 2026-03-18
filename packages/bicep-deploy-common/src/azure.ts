@@ -10,12 +10,12 @@ import {
   TokenCredential,
 } from "@azure/identity";
 import { AdditionalPolicyConfig } from "@azure/core-client";
+import { execSync } from "child_process";
 
 import { Logger } from "./logging";
 import { DeployConfig } from "./config";
 
 const userAgentPrefix = "gh-azure-bicep-deploy";
-const dummySubscriptionId = "00000000-0000-0000-0000-000000000000";
 const endpoints = {
   azureCloud: "https://management.azure.com",
   azureChinaCloud: "https://management.chinacloudapi.cn",
@@ -23,16 +23,58 @@ const endpoints = {
   azureUSGovernment: "https://management.usgovcloudapi.net",
 };
 
+export async function getDefaultSubscriptionId(): Promise<string | undefined> {
+  // Try Azure CLI first
+  try {
+    const result = execSync("az account show --query id -o tsv", {
+      encoding: "utf8",
+      timeout: 10000,
+    });
+    const subscriptionId = result.trim();
+    if (subscriptionId) {
+      return subscriptionId;
+    }
+  } catch {
+    // Azure CLI failed or not available, try PowerShell
+  }
+
+  // Try Azure PowerShell
+  try {
+    const result = execSync(
+      "pwsh -Command \"(Get-AzContext).Subscription.Id\" 2>/dev/null || powershell -Command \"(Get-AzContext).Subscription.Id\"",
+      {
+        encoding: "utf8",
+        timeout: 10000,
+      },
+    );
+    const subscriptionId = result.trim();
+    if (subscriptionId) {
+      return subscriptionId;
+    }
+  } catch {
+    // PowerShell failed or not available
+  }
+
+  return undefined;
+}
+
 export function createDeploymentClient(
   config: DeployConfig,
   logger: Logger,
   subscriptionId?: string,
   tenantId?: string,
 ): ResourceManagementClient {
+  // If subscriptionId is not provided, this will fail - the caller should resolve it first
+  if (!subscriptionId) {
+    throw new Error(
+      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
+        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
+    );
+  }
+
   return new ResourceManagementClient(
     getCredential(tenantId),
-    // Use a dummy subscription ID for above-subscription scope operations
-    subscriptionId ?? dummySubscriptionId,
+    subscriptionId,
     {
       userAgentOptions: {
         userAgentPrefix: userAgentPrefix,
@@ -51,10 +93,17 @@ export function createStacksClient(
   subscriptionId?: string,
   tenantId?: string,
 ): DeploymentStacksClient {
+  // If subscriptionId is not provided, this will fail - the caller should resolve it first
+  if (!subscriptionId) {
+    throw new Error(
+      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
+        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
+    );
+  }
+
   return new DeploymentStacksClient(
     getCredential(tenantId),
-    // Use a dummy subscription ID for above-subscription scope operations
-    subscriptionId ?? dummySubscriptionId,
+    subscriptionId,
     {
       userAgentOptions: {
         userAgentPrefix: userAgentPrefix,

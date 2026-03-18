@@ -16,6 +16,7 @@ export interface LoggingMessageConfig {
   ) => string;
   usingTemplateFile: (templateFile: string) => string;
   usingParametersFile: (parametersFile: string) => string;
+  usingSubscriptionFromContext: (subscriptionId: string) => string;
 }
 
 const defaultLoggingMessages: LoggingMessageConfig = {
@@ -40,6 +41,8 @@ const defaultLoggingMessages: LoggingMessageConfig = {
     `Using template file: ${templateFile}`,
   usingParametersFile: (parametersFile: string) =>
     `Using parameters file: ${parametersFile}`,
+  usingSubscriptionFromContext: (subscriptionId: string) =>
+    `Using subscription '${subscriptionId}' from Azure context`,
 };
 
 let currentLoggingMessages: LoggingMessageConfig = {

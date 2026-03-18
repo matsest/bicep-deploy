@@ -120,7 +120,7 @@ describe("input validation", () => {
     );
   });
 
-  it("requires subscriptionId if scope is subscription", async () => {
+  it("does not require subscriptionId if scope is subscription", async () => {
     configureGetInputMock(
       {
         type: "deployment",
@@ -130,24 +130,26 @@ describe("input validation", () => {
       inputReader,
     );
 
-    expect(() => parseConfig(inputReader, inputParameterNames)).toThrow(
-      "Input 'subscriptionId' is required but not provided",
-    );
+    const config = parseConfig(inputReader, inputParameterNames);
+    expect(config.scope.type).toBe("subscription");
+    expect(config.scope.subscriptionId).toBeUndefined();
   });
 
-  it("requires subscriptionId if scope is resourceGroup", async () => {
+  it("does not require subscriptionId if scope is resourceGroup", async () => {
     configureGetInputMock(
       {
         type: "deployment",
         operation: "create",
         scope: "resourceGroup",
+        resourceGroupName: "myResourceGroup",
       },
       inputReader,
     );
 
-    expect(() => parseConfig(inputReader, inputParameterNames)).toThrow(
-      "Input 'subscriptionId' is required but not provided",
-    );
+    const config = parseConfig(inputReader, inputParameterNames);
+    expect(config.scope.type).toBe("resourceGroup");
+    expect(config.scope.resourceGroup).toBe("myResourceGroup");
+    expect(config.scope.subscriptionId).toBeUndefined();
   });
 
   it("requires resourceGroupName if scope is resourceGroup", async () => {

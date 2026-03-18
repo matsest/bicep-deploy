@@ -37,12 +37,12 @@ export type ManagementGroupScope = CommonScope & {
 
 export type SubscriptionScope = CommonScope & {
   type: "subscription";
-  subscriptionId: string;
+  subscriptionId?: string;
 };
 
 export type ResourceGroupScope = CommonScope & {
   type: "resourceGroup";
-  subscriptionId: string;
+  subscriptionId?: string;
   resourceGroup: string;
 };
 
@@ -302,7 +302,7 @@ function parseDeploymentScope(
       };
     }
     case "subscription": {
-      const subscriptionId = getRequiredStringInput(
+      const subscriptionId = getOptionalStringInput(
         inputParameterNames.subscriptionId,
         inputReader,
       );
@@ -313,7 +313,7 @@ function parseDeploymentScope(
       };
     }
     case "resourceGroup": {
-      const subscriptionId = getRequiredStringInput(
+      const subscriptionId = getOptionalStringInput(
         inputParameterNames.subscriptionId,
         inputReader,
       );
@@ -358,7 +358,7 @@ function parseDeploymentStackScope(
       };
     }
     case "subscription": {
-      const subscriptionId = getRequiredStringInput(
+      const subscriptionId = getOptionalStringInput(
         inputParameterNames.subscriptionId,
         inputReader,
       );
@@ -369,7 +369,7 @@ function parseDeploymentStackScope(
       };
     }
     case "resourceGroup": {
-      const subscriptionId = getRequiredStringInput(
+      const subscriptionId = getOptionalStringInput(
         inputParameterNames.subscriptionId,
         inputReader,
       );

@@ -6,6 +6,8 @@
 
 This snippet showcases the default usage of the `azure/bicep-deploy@v2` action for creating an Azure resource group-level deployment when using a .bicepparam file. It initiates a deployment named "Development" at the resource group scope. The deployment uses `main.bicepparam` for parameters (which has a `uses` reference to a bicep template file), targeting a specific Azure resource group.
 
+> **Note:** The `subscription-id` parameter is optional for all deployment scopes. If not provided, the action will use the default subscription from the Azure context (set via `azure/login`). The explicit subscription ID below shows how you can override the default context to target a different subscription.
+
 ```yaml
 - name: Sample
   uses: azure/bicep-deploy@v2
@@ -14,7 +16,7 @@ This snippet showcases the default usage of the `azure/bicep-deploy@v2` action f
     operation: create
     name: Development
     scope: resourceGroup
-    subscription-id: 00000000-0000-0000-0000-000000000000
+    subscription-id: 00000000-0000-0000-0000-000000000000  # Optional: defaults to azure/login context
     resource-group-name: example
     parameters-file: ./main.bicepparam
 ```
@@ -59,6 +61,8 @@ This snippet demonstrates the default usage of the `azure/bicep-deploy@v2` actio
 ### Create
 
 This workflow automates the deployment process by triggering on pushes to the main branch. It runs on an Ubuntu runner, checks out the repository, logs into Azure with federated credentials, and deploys using the specified ARM or Bicep templates and parameters, targeting a specific Azure resource group.
+
+> **Note:** The `subscription-id` parameter is optional and will default to the subscription from the Azure login context. The explicit value below demonstrates how to override the default context to target a different subscription.
 
 ```yaml
 name: Deployment (Create)

@@ -31,7 +31,6 @@ This action simplifies Azure resource management, providing flexibility through 
     name: Development
     location: westus2
     scope: subscription
-    subscription-id: 00000000-0000-0000-0000-000000000000
     template-file: ./main.bicep
     parameters-file: ./main.bicepparam
 ```
@@ -49,7 +48,6 @@ See more examples in [examples/DEPLOYMENT.md](./examples/DEPLOYMENT.md).
     name: Development
     location: westus2
     scope: subscription
-    subscription-id: 00000000-0000-0000-0000-000000000000
     template-file: ./main.bicep
     parameters-file: ./main.bicepparam
     action-on-unmanage-resources: delete
@@ -79,7 +77,7 @@ The inputs for this action provide flexibility and control for managing deployme
 | `location`                            | Specifies the location of the deployment or deploymentStack. Must be provided if the 'scope' parameter is 'subscription', 'managementGroup' or 'tenant'. | Free-text                                                                                                                                        | No       |
 | `tenant-id`                           | Specifies the tenant ID. Required if the 'scope' parameter is 'tenant'.                                       | Free-text                                                                                                                                        | No       |
 | `management-group-id`                 | Specifies the management group ID. Required if the 'scope' parameter is 'managementGroup'.                    | Free-text                                                                                                                                        | No       |
-| `subscription-id`                     | Specifies the subscription ID. Required if the 'scope' parameter is 'subscription' or 'resourceGroup'.        | Free-text                                                                                                                                        | No       |
+| `subscription-id`                     | Specifies the subscription ID. Optional for all scope types. If not provided, the default subscription from the Azure context (set via `azure/login`) will be used. Can be explicitly provided to override the default subscription. | Free-text                                                                                                                                        | No       |
 | `resource-group-name`                 | Specifies the resource group name. Required if the 'scope' parameter is 'resourceGroup'.                      | Free-text                                                                                                                                        | No       |
 | `template-file`                       | Specifies the path to the template file.                                                                      | Free-text                                                                                                                                        | No       |
 | `parameters-file`                     | Specifies the path to the parameters file (.json or .bicepparam).                                             | Free-text                                                                                                                                        | No       |

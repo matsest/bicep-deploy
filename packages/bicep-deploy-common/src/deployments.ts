@@ -20,7 +20,7 @@ export async function deploymentCreate(
 ) {
   const name = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getDeploymentClient(config, scope, logger);
+  const client = await getDeploymentClient(config, scope, logger);
   const deployment = createDeploymentDefinition(config, files);
 
   switch (scope.type) {
@@ -69,7 +69,7 @@ export async function deploymentValidate(
 ) {
   const name = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getDeploymentClient(config, scope, logger);
+  const client = await getDeploymentClient(config, scope, logger);
   const deployment = createDeploymentDefinition(config, files);
 
   switch (scope.type) {
@@ -111,7 +111,7 @@ export async function deploymentWhatIf(
 ) {
   const deploymentName = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getDeploymentClient(config, scope, logger);
+  const client = await getDeploymentClient(config, scope, logger);
   const deployment = createDeploymentDefinition(config, files);
 
   switch (scope.type) {

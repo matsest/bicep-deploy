@@ -6,6 +6,8 @@
 
 This snippet demonstrates the default usage of the `azure/bicep-deploy@v2` GitHub Action to create a deployment stack. It deploys a "Development" environment in the `westus2` region at the subscription scope, using `main.bicep` as the template and `main.bicepparam` for parameters. The deployment also deletes untracked resources and resource groups as needed, applies deny settings to prevent write and delete actions, and includes a description for the stack.
 
+> **Note:** The `subscription-id` parameter is optional for all deployment scopes. If not provided, the action will use the default subscription from the Azure context (set via `azure/login`). The explicit subscription ID below shows how you can override the default context to target a different subscription.
+
 ```yaml
 - name: Create
   uses: azure/bicep-deploy@v2
@@ -15,7 +17,7 @@ This snippet demonstrates the default usage of the `azure/bicep-deploy@v2` GitHu
     name: Development
     location: westus2
     scope: subscription
-    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Optional: defaults to azure/login context
     parameters-file: ./main.bicepparam
     action-on-unmanage-resources: delete
     action-on-unmanage-resourcegroups: delete
@@ -49,6 +51,8 @@ This snippet illustrates the default usage of the `azure/bicep-deploy@v2` action
 ### Create
 
 This workflow triggers on every push to the main branch. It checks out the repository, logs into Azure, and deploys a "Development" stack in the `westus2` region using the provided template and parameters files. It also manages any untracked resources, applies deny policies, and adds a deployment description for clarity.
+
+> **Note:** The `subscription-id` parameter is optional and will default to the subscription from the Azure login context. The explicit value below demonstrates how to override the default context to target a different subscription.
 
 ```yaml
 name: Stacks (Create)

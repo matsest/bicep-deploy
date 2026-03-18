@@ -29,6 +29,7 @@ export const azureMock = {
   createStacksClient: vi.fn().mockReturnValue({
     deploymentStacks: mockStacksOps,
   }),
+  getDefaultSubscriptionId: vi.fn().mockResolvedValue(undefined),
 };
 
 vi.mock("../../src/azure", () => azureMock);

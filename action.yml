@@ -34,7 +34,7 @@ inputs:
     description: "Specifies the management group ID. Required if the 'scope' parameter is 'managementGroup'."
     required: false
   subscription-id:
-    description: "Specifies the subscription ID. Required if the 'scope' parameter is 'subscription' or 'resourceGroup'."
+    description: "Specifies the subscription ID. Optional for all scope types. If not provided, the default subscription from the Azure context (set via azure/login or equivalent) will be used. Can be explicitly provided to override the default subscription."
     required: false
   resource-group-name:
     description: "Specifies the resource group name. Required if the 'scope' parameter is 'resourceGroup'."

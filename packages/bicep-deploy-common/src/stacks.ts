@@ -20,7 +20,7 @@ export async function stackCreate(
 ) {
   const name = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getStacksClient(config, scope, logger);
+  const client = await getStacksClient(config, scope, logger);
   const stack = createStackDefinition(config, files);
 
   switch (scope.type) {
@@ -60,7 +60,7 @@ export async function stackValidate(
 ) {
   const name = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getStacksClient(config, scope, logger);
+  const client = await getStacksClient(config, scope, logger);
   const stack = createStackDefinition(config, files);
 
   switch (scope.type) {
@@ -96,7 +96,7 @@ export async function stackDelete(
 ) {
   const name = config.name ?? defaultName;
   const scope = config.scope;
-  const client = getStacksClient(config, scope, logger);
+  const client = await getStacksClient(config, scope, logger);
   const deletionOptions = getStackDeletionOptions(config);
 
   switch (scope.type) {

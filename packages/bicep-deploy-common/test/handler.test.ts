@@ -179,6 +179,56 @@ describe("deployment execution", () => {
         mockDeploymentsOps.beginWhatIfAtSubscriptionScopeAndWait,
       ).toHaveBeenCalledWith(config.name, expectedPayload);
     });
+
+    it("resolves subscription from context when not provided", async () => {
+      const scopeWithoutSub: SubscriptionScope = {
+        type: "subscription",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentsConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      const contextSubId = "contextSubscriptionId";
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(contextSubId);
+      mockDeploymentsOps.beginCreateOrUpdateAtSubscriptionScopeAndWait!.mockResolvedValue(
+        mockReturnPayload,
+      );
+
+      logger.clear();
+      await execute(configWithoutSub, logger, outputSetter, noopCache);
+
+      expect(azureMock.getDefaultSubscriptionId).toHaveBeenCalled();
+      expect(azureMock.createDeploymentClient).toHaveBeenCalledWith(
+        configWithoutSub,
+        logger,
+        contextSubId,
+        undefined,
+      );
+      
+      const infoLogs = logger.getInfoMessages();
+      expect(infoLogs.some(log => log.includes("Using subscription 'contextSubscriptionId' from Azure context"))).toBe(true);
+    });
+
+    it("throws error when subscription cannot be determined", async () => {
+      const scopeWithoutSub: SubscriptionScope = {
+        type: "subscription",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentsConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(undefined);
+
+      await expect(
+        execute(configWithoutSub, logger, outputSetter, noopCache),
+      ).rejects.toThrow(
+        "Subscription ID is required but was not provided and could not be determined from Azure context",
+      );
+    });
   });
 
   describe("resource group scope", () => {
@@ -414,6 +464,58 @@ describe("deployment execution", () => {
         scope.resourceGroup,
         config.name,
         expectedPayload,
+      );
+    });
+
+    it("resolves subscription from context when not provided", async () => {
+      const scopeWithoutSub: ResourceGroupScope = {
+        type: "resourceGroup",
+        resourceGroup: "mockRg",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentsConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      const contextSubId = "contextSubscriptionId";
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(contextSubId);
+      mockDeploymentsOps.beginCreateOrUpdateAndWait!.mockResolvedValue(
+        mockReturnPayload,
+      );
+
+      logger.clear();
+      await execute(configWithoutSub, logger, outputSetter, noopCache);
+
+      expect(azureMock.getDefaultSubscriptionId).toHaveBeenCalled();
+      expect(azureMock.createDeploymentClient).toHaveBeenCalledWith(
+        configWithoutSub,
+        logger,
+        contextSubId,
+        undefined,
+      );
+      
+      const infoLogs = logger.getInfoMessages();
+      expect(infoLogs.some(log => log.includes("Using subscription 'contextSubscriptionId' from Azure context"))).toBe(true);
+    });
+
+    it("throws error when subscription cannot be determined for resource group", async () => {
+      const scopeWithoutSub: ResourceGroupScope = {
+        type: "resourceGroup",
+        resourceGroup: "mockRg",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentsConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(undefined);
+
+      await expect(
+        execute(configWithoutSub, logger, outputSetter, noopCache),
+      ).rejects.toThrow(
+        "Subscription ID is required but was not provided and could not be determined from Azure context",
       );
     });
   });
@@ -690,6 +792,54 @@ describe("stack execution", () => {
 
       expect(spyLogWarning).not.toHaveBeenCalled();
     });
+
+    it("resolves subscription from context when not provided", async () => {
+      const scopeWithoutSub: SubscriptionScope = {
+        type: "subscription",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentStackConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      const contextSubId = "contextSubscriptionId";
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(contextSubId);
+      mockStacksOps.beginCreateOrUpdateAtSubscriptionAndWait!.mockResolvedValue({});
+
+      logger.clear();
+      await execute(configWithoutSub, logger, outputSetter, noopCache);
+
+      expect(azureMock.getDefaultSubscriptionId).toHaveBeenCalled();
+      expect(azureMock.createStacksClient).toHaveBeenCalledWith(
+        configWithoutSub,
+        logger,
+        contextSubId,
+        undefined,
+      );
+      
+      const infoLogs = logger.getInfoMessages();
+      expect(infoLogs.some(log => log.includes("Using subscription 'contextSubscriptionId' from Azure context"))).toBe(true);
+    });
+
+    it("throws error when subscription cannot be determined", async () => {
+      const scopeWithoutSub: SubscriptionScope = {
+        type: "subscription",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentStackConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(undefined);
+
+      await expect(
+        execute(configWithoutSub, logger, outputSetter, noopCache),
+      ).rejects.toThrow(
+        "Subscription ID is required but was not provided and could not be determined from Azure context",
+      );
+    });
   });
 
   describe("resource group scope", () => {
@@ -832,6 +982,58 @@ describe("stack execution", () => {
         bypassStackOutOfSyncError: true,
         unmanageActionResources: "delete",
       });
+    });
+
+    it("resolves subscription from context when not provided", async () => {
+      const scopeWithoutSub: ResourceGroupScope = {
+        type: "resourceGroup",
+        resourceGroup: "mockRg",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentStackConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      const contextSubId = "contextSubscriptionId";
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(contextSubId);
+      mockStacksOps.beginCreateOrUpdateAtResourceGroupAndWait!.mockResolvedValue(
+        mockReturnPayload,
+      );
+
+      logger.clear();
+      await execute(configWithoutSub, logger, outputSetter, noopCache);
+
+      expect(azureMock.getDefaultSubscriptionId).toHaveBeenCalled();
+      expect(azureMock.createStacksClient).toHaveBeenCalledWith(
+        configWithoutSub,
+        logger,
+        contextSubId,
+        undefined,
+      );
+      
+      const infoLogs = logger.getInfoMessages();
+      expect(infoLogs.some(log => log.includes("Using subscription 'contextSubscriptionId' from Azure context"))).toBe(true);
+    });
+
+    it("throws error when subscription cannot be determined for resource group", async () => {
+      const scopeWithoutSub: ResourceGroupScope = {
+        type: "resourceGroup",
+        resourceGroup: "mockRg",
+        subscriptionId: undefined,
+      };
+      const configWithoutSub: DeploymentStackConfig = {
+        ...config,
+        scope: scopeWithoutSub,
+      };
+      
+      azureMock.getDefaultSubscriptionId.mockResolvedValueOnce(undefined);
+
+      await expect(
+        execute(configWithoutSub, logger, outputSetter, noopCache),
+      ).rejects.toThrow(
+        "Subscription ID is required but was not provided and could not be determined from Azure context",
+      );
     });
   });
 });
