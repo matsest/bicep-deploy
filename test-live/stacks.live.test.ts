@@ -26,6 +26,24 @@ deny-settings-mode: denyWriteAndDelete
     expect(failure).not.toBeDefined();
   });
 
+  it("runs validation without explicit subscription-id (uses context)", async () => {
+    const { failure } = await runAction(
+      data => `
+type: deploymentStack
+operation: validate
+name: 'e2e-validate-no-sub'
+scope: resourceGroup
+resource-group-name: ${data.resourceGroup}
+parameters-file: test/files/basic/main.bicepparam
+action-on-unmanage-resources: delete
+action-on-unmanage-resourcegroups: delete
+deny-settings-mode: denyWriteAndDelete
+`,
+    );
+
+    expect(failure).not.toBeDefined();
+  });
+
   it("runs create and handles failures", async () => {
     const { failure, errors } = await runAction(
       data => `

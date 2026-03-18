@@ -7,7 +7,22 @@ beforeEach(() => {
 });
 
 describe("deployments live tests", () => {
-  it("runs validation", async () => {
+  it("runs validation without explicit subscription-id (uses context)", async () => {
+    const { failure } = await runAction(
+      data => `
+type: deployment
+operation: validate
+name: 'e2e-validate-no-sub'
+scope: resourceGroup
+resource-group-name: ${data.resourceGroup}
+parameters-file: test/files/basic/main.bicepparam
+`,
+    );
+
+    expect(failure).not.toBeDefined();
+  });
+
+  it("runs validation with explicit subscription-id", async () => {
     const { failure } = await runAction(
       data => `
 type: deployment
