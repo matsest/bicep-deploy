@@ -16,6 +16,7 @@ import { Logger } from "./logging";
 import { DeployConfig } from "./config";
 
 const userAgentPrefix = "gh-azure-bicep-deploy";
+const dummySubscriptionId = "00000000-0000-0000-0000-000000000000";
 const endpoints = {
   azureCloud: "https://management.azure.com",
   azureChinaCloud: "https://management.chinacloudapi.cn",
@@ -64,17 +65,10 @@ export function createDeploymentClient(
   subscriptionId?: string,
   tenantId?: string,
 ): ResourceManagementClient {
-  // If subscriptionId is not provided, this will fail - the caller should resolve it first
-  if (!subscriptionId) {
-    throw new Error(
-      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
-        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
-    );
-  }
-
   return new ResourceManagementClient(
     getCredential(tenantId),
-    subscriptionId,
+    // Use subscription ID if provided, otherwise use dummy for tenant/management group scopes
+    subscriptionId ?? dummySubscriptionId,
     {
       userAgentOptions: {
         userAgentPrefix: userAgentPrefix,
@@ -93,17 +87,10 @@ export function createStacksClient(
   subscriptionId?: string,
   tenantId?: string,
 ): DeploymentStacksClient {
-  // If subscriptionId is not provided, this will fail - the caller should resolve it first
-  if (!subscriptionId) {
-    throw new Error(
-      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
-        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
-    );
-  }
-
   return new DeploymentStacksClient(
     getCredential(tenantId),
-    subscriptionId,
+    // Use subscription ID if provided, otherwise use dummy for tenant/management group scopes
+    subscriptionId ?? dummySubscriptionId,
     {
       userAgentOptions: {
         userAgentPrefix: userAgentPrefix,

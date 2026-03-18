@@ -69,6 +69,14 @@ export async function getDeploymentClient(
     }
   }
 
+  // For subscription and resource group scopes, subscriptionId is required
+  if (!subscriptionId && "subscriptionId" in scope) {
+    throw new Error(
+      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
+        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
+    );
+  }
+
   return createDeploymentClient(config, logger, subscriptionId, tenantId);
 }
 
@@ -93,6 +101,14 @@ export async function getStacksClient(
         loggingMessages.usingSubscriptionFromContext(subscriptionId),
       );
     }
+  }
+
+  // For subscription and resource group scopes, subscriptionId is required
+  if (!subscriptionId && "subscriptionId" in scope) {
+    throw new Error(
+      "Subscription ID is required but was not provided and could not be determined from Azure context. " +
+        "Please provide subscription-id explicitly or ensure azure/login has set a default subscription.",
+    );
   }
 
   return createStacksClient(config, logger, subscriptionId, tenantId);
